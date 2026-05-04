@@ -1,346 +1,206 @@
-import { Bar, Line, Doughnut, Radar } from "react-chartjs-2";
+import { useState } from "react";
+import { Bar, Line, Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  RadarController,
-  Filler,
-  Title,
-  Tooltip,
-  Legend
+  CategoryScale, LinearScale, PointElement,
+  LineElement, BarElement, ArcElement,
+  RadarController, Filler, Title, Tooltip, Legend
 } from "chart.js";
 
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  RadarController,
-  Filler,
-  Title,
-  Tooltip,
-  Legend
+  CategoryScale, LinearScale, PointElement,
+  LineElement, BarElement, ArcElement,
+  RadarController, Filler, Title, Tooltip, Legend
 );
 
-const colors = {
-  primary: "#14b8a6",
-  accent: "#f97316",
-  secondary: "#8b5cf6",
-  info: "#06b6d4",
-  danger: "#ef4444",
-  success: "#10b981",
-  warning: "#eab308"
-};
-
 const palette = [
-  colors.primary + "dd",
-  colors.accent + "dd",
-  colors.secondary + "dd",
-  colors.info + "dd",
-  colors.danger + "dd",
-  colors.success + "dd",
-  colors.warning + "dd",
-  "#a855f7dd",
-  "#ec4899dd",
-  "#f43f5edd"
+  "#00e6a8", "#06b6d4", "#8b5cf6", "#f97316",
+  "#ec4899", "#eab308", "#14b8a6", "#f43f5e",
+  "#a855f7", "#10b981"
 ];
 
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: true,
-  plugins: {
-    legend: {
-      display: true,
-      position: "bottom",
-      labels: {
-        color: "var(--text)",
-        font: { size: 11, weight: "500" },
-        padding: 12,
-        boxHeight: 8,
-      },
-    },
-    tooltip: {
-      backgroundColor: "rgba(15, 23, 42, 0.9)",
-      titleColor: "#fff",
-      bodyColor: "#fff",
-      borderColor: colors.primary,
-      borderWidth: 1,
-      padding: 10,
-      titleFont: { size: 12, weight: "bold" },
-      bodyFont: { size: 11 },
-      boxPadding: 6,
-    },
-  },
-  scales: {
-    x: {
-      ticks: { color: "var(--text-muted)", font: { size: 10 }, maxRotation: 45, minRotation: 0 },
-      grid: { color: "var(--border)", drawBorder: false },
-    },
-    y: {
-      ticks: { color: "var(--text-muted)", font: { size: 10 } },
-      grid: { color: "var(--border)", drawBorder: false },
-    },
-  },
+const glassCard = {
+  background: "rgba(255,255,255,0.035)",
+  backdropFilter: "blur(20px)",
+  WebkitBackdropFilter: "blur(20px)",
+  border: "1px solid rgba(255,255,255,0.07)",
+  borderRadius: 20,
+  transition: "all 0.3s",
 };
 
-const radarOptions = {
-  responsive: true,
-  maintainAspectRatio: true,
-  plugins: {
-    legend: {
-      display: true,
-      position: "bottom",
-      labels: { color: "var(--text)", font: { size: 11, weight: "500" }, padding: 12 },
+function makeChartOptions(hideScales = false) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: "bottom",
+        labels: {
+          color: "#8899aa",
+          font: { size: 11, weight: "500", family: "'Inter', sans-serif" },
+          padding: 16, boxHeight: 10, boxWidth: 12, borderRadius: 3,
+          usePointStyle: true, pointStyle: "rectRounded",
+        },
+      },
+      tooltip: {
+        backgroundColor: "rgba(12, 18, 32, 0.95)",
+        titleColor: "#f0f4f8",
+        bodyColor: "#8899aa",
+        borderColor: "rgba(0,230,168,0.3)",
+        borderWidth: 1,
+        padding: 14,
+        titleFont: { size: 13, weight: "700", family: "'Inter', sans-serif" },
+        bodyFont: { size: 12, family: "'Inter', sans-serif" },
+        boxPadding: 6,
+        cornerRadius: 12,
+        displayColors: true,
+      },
     },
-    tooltip: {
-      backgroundColor: "rgba(15, 23, 42, 0.9)",
-      titleColor: "#fff",
-      bodyColor: "#fff",
-      borderColor: colors.primary,
-      borderWidth: 1,
+    scales: hideScales ? {} : {
+      x: {
+        ticks: { color: "#556677", font: { size: 10, family: "'Inter', sans-serif" }, maxRotation: 45, minRotation: 0 },
+        grid: { color: "rgba(255,255,255,0.04)", drawBorder: false },
+        border: { display: false },
+      },
+      y: {
+        ticks: { color: "#556677", font: { size: 10, family: "'DM Mono', monospace" } },
+        grid: { color: "rgba(255,255,255,0.04)", drawBorder: false },
+        border: { display: false },
+      },
     },
-  },
-  scales: {
-    r: {
-      ticks: { color: "var(--text-muted)", font: { size: 9 }, backdropColor: "transparent" },
-      grid: { color: "var(--border)" },
-    },
-  },
-};
+  };
+}
+
+// Section tabs for the chart dashboard
+const CHART_SECTIONS = [
+  { id: "timeline", label: "📈 Évolution" },
+  { id: "profil", label: "👤 Profil" },
+  { id: "acces", label: "🏥 Accès soins" },
+  { id: "telehealth", label: "📱 Téléconsultation" },
+  { id: "numerique", label: "💻 Numérique" },
+];
 
 export default function StatsCharts({ stats }) {
+  const [activeSection, setActiveSection] = useState("timeline");
   if (!stats) return null;
 
-  // Timeline chart
-  const timelineData = stats.timeline ? {
-    labels: stats.timeline.map((item) => item._id),
-    datasets: [
-      {
-        label: "Réponses reçues",
-        data: stats.timeline.map((item) => item.count),
-        borderColor: colors.primary,
-        backgroundColor: colors.primary + "33",
-        borderWidth: 3,
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: colors.primary,
-        pointBorderColor: "#fff",
-        pointBorderWidth: 2,
-        pointRadius: 5,
-        pointHoverRadius: 7,
-      },
-    ],
-  } : null;
-
-  // Consultation frequency (Q7) - médical relevant
-  const consultationData = stats.acces?.Q7 ? {
-    labels: Object.keys(stats.acces.Q7 || {}).map(k => k.substring(0, 30)),
-    datasets: [{
-      label: "Fréquence de consultation",
-      data: Object.values(stats.acces.Q7 || {}),
-      backgroundColor: palette.slice(0, Object.keys(stats.acces.Q7 || {}).length),
-      borderColor: "#fff",
-      borderWidth: 2,
-    }],
-  } : null;
-
-  // Distance to healthcare (Q8)
-  const distanceData = stats.acces?.Q8 ? {
-    labels: Object.keys(stats.acces.Q8 || {}),
-    datasets: [{
-      label: "Distance structure sanitaire",
-      data: Object.values(stats.acces.Q8 || {}),
-      backgroundColor: [colors.success + "dd", colors.info + "dd", colors.warning + "dd", colors.danger + "dd", colors.secondary + "dd"],
-      borderColor: "#fff",
-      borderWidth: 2,
-    }],
-  } : null;
-
-  // Wait time (Q9)
-  const waitTimeData = stats.acces?.Q9 ? {
-    labels: Object.keys(stats.acces.Q9 || {}),
-    datasets: [{
-      label: "Temps d'attente moyen",
-      data: Object.values(stats.acces.Q9 || {}),
-      backgroundColor: [colors.success + "dd", colors.info + "dd", colors.warning + "dd", colors.danger + "dd"],
-      borderColor: "#fff",
-      borderWidth: 2,
-    }],
-  } : null;
-
-  // Barriers to access (Q10)
-  const barriersData = stats.acces?.Q10 ? {
-    labels: Object.keys(stats.acces.Q10 || {}).map(k => k.substring(0, 20)),
-    datasets: [{
-      label: "Freins d'accès aux soins",
-      data: Object.values(stats.acces.Q10 || {}),
-      backgroundColor: colors.accent + "dd",
-      borderColor: "#fff",
-      borderWidth: 2,
-    }],
-  } : null;
-
-  // Medical expenses (Q11)
-  const expenseData = stats.acces?.Q11 ? {
-    labels: Object.keys(stats.acces.Q11 || {}),
-    datasets: [{
-      label: "Budget de consultation",
-      data: Object.values(stats.acces.Q11 || {}),
-      backgroundColor: palette.slice(0, Object.keys(stats.acces.Q11 || {}).length),
-      borderColor: "#fff",
-      borderWidth: 2,
-    }],
-  } : null;
-
-  // Telehealth readiness (Q18)
-  const telehealthReadinessData = stats.teleconsultation?.Q18 ? {
-    labels: Object.keys(stats.teleconsultation.Q18 || {}),
-    datasets: [{
-      label: "Acceptabilité téléconsultation",
-      data: Object.values(stats.teleconsultation.Q18 || {}),
-      backgroundColor: [colors.primary + "dd", colors.secondary + "dd", colors.info + "dd", colors.warning + "dd"],
-      borderColor: "#fff",
-      borderWidth: 2,
-    }],
-  } : null;
-
-  // Preferred telehealth mode (Q20)
-  const modePrefData = stats.teleconsultation?.Q20 ? {
-    labels: Object.keys(stats.teleconsultation.Q20 || {}),
-    datasets: [{
-      label: "Mode préféré",
-      data: Object.values(stats.teleconsultation.Q20 || {}),
-      backgroundColor: [colors.primary + "cc", colors.accent + "cc", colors.secondary + "cc", colors.info + "cc"],
-      borderColor: "#fff",
-      borderWidth: 2,
-    }],
-  } : null;
-
-  // Acceptable price for telehealth (Q21)
-  const priceData = stats.teleconsultation?.Q21 ? {
-    labels: Object.keys(stats.teleconsultation.Q21 || {}),
-    datasets: [{
-      label: "Prix acceptable",
-      data: Object.values(stats.teleconsultation.Q21 || {}),
-      backgroundColor: palette.slice(0, Object.keys(stats.teleconsultation.Q21 || {}).length),
-      borderColor: "#fff",
-      borderWidth: 2,
-    }],
-  } : null;
-
-  // Digital medical record interest (Q24)
-  const medicalRecordData = stats.dossier?.Q24 ? {
-    labels: Object.keys(stats.dossier.Q24 || {}),
-    datasets: [{
-      label: "Intérêt dossier médical numérique",
-      data: Object.values(stats.dossier.Q24 || {}),
-      backgroundColor: [colors.primary + "dd", colors.success + "dd", colors.warning + "dd"],
-      borderColor: "#fff",
-      borderWidth: 2,
-    }],
-  } : null;
-
-  // Age distribution
-  const ageData = stats.profil?.Q1 ? {
-    labels: Object.keys(stats.profil.Q1 || {}),
-    datasets: [{
-      label: "Distribution par âge",
-      data: Object.values(stats.profil.Q1 || {}),
-      backgroundColor: palette.slice(0, Object.keys(stats.profil.Q1 || {}).length),
-      borderColor: "#fff",
-      borderWidth: 2,
-    }],
-  } : null;
-
-  // Insurance coverage (Q12)
-  const insuranceData = stats.acces?.Q12 ? {
-    labels: Object.keys(stats.acces.Q12 || {}),
-    datasets: [{
-      label: "Couverture santé",
-      data: Object.values(stats.acces.Q12 || {}),
-      backgroundColor: [colors.success + "dd", colors.danger + "dd", colors.warning + "dd"],
-      borderColor: "#fff",
-      borderWidth: 2,
-    }],
-  } : null;
-
-  // Phone type
-  const phoneData = stats.numerique?.Q13 ? {
-    labels: Object.keys(stats.numerique.Q13 || {}),
-    datasets: [{
-      label: "Type de téléphone",
-      data: Object.values(stats.numerique.Q13 || {}),
-      backgroundColor: [colors.primary + "dd", colors.secondary + "dd", colors.info + "dd"],
-      borderColor: "#fff",
-      borderWidth: 2,
-    }],
-  } : null;
-
   return (
-    <div style={{ display: "grid", gap: 24 }}>
+    <div>
+      {/* Section tabs */}
+      <div style={{
+        display: "flex", gap: 4, marginBottom: 24, padding: 5,
+        ...glassCard, borderRadius: 14, width: "fit-content",
+        overflowX: "auto", maxWidth: "100%"
+      }}>
+        {CHART_SECTIONS.map(s => (
+          <button key={s.id} onClick={() => setActiveSection(s.id)} style={{
+            padding: "8px 18px", borderRadius: 10, border: "none",
+            background: activeSection === s.id ? "rgba(0,230,168,0.12)" : "transparent",
+            color: activeSection === s.id ? "#00e6a8" : "#8899aa",
+            fontWeight: 600, cursor: "pointer", fontSize: 13, whiteSpace: "nowrap",
+            fontFamily: "'Inter', sans-serif", transition: "all 0.2s"
+          }}>{s.label}</button>
+        ))}
+      </div>
+
       {/* Timeline */}
-      {timelineData && (
-        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 24 }}>
-          <h3 style={{ margin: "0 0 20px 0", fontSize: 16, fontWeight: 700, color: "var(--text)" }}>
-            Évolution des réponses
-          </h3>
-          <div style={{ height: 300 }}>
-            <Line data={timelineData} options={chartOptions} />
+      {activeSection === "timeline" && stats.timeline && (
+        <div style={{ ...glassCard, padding: 28, animation: "fadeIn 0.4s ease-out" }}>
+          <h3 style={{ margin: "0 0 20px", fontSize: 17, fontWeight: 700, color: "#f0f4f8" }}>Évolution des réponses</h3>
+          <div style={{ height: 320 }}>
+            <Line data={{
+              labels: stats.timeline.map(d => d._id),
+              datasets: [{
+                label: "Réponses reçues",
+                data: stats.timeline.map(d => d.count),
+                borderColor: "#00e6a8",
+                backgroundColor: "rgba(0,230,168,0.08)",
+                borderWidth: 3, fill: true, tension: 0.4,
+                pointBackgroundColor: "#00e6a8",
+                pointBorderColor: "rgba(12,18,32,0.9)",
+                pointBorderWidth: 3, pointRadius: 5, pointHoverRadius: 8,
+              }]
+            }} options={makeChartOptions()} />
           </div>
         </div>
       )}
 
-      {/* Top 3 Medical Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
-        {consultationData && (
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20 }}>
-            <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              Fréquence consultation
-            </h3>
-            <div style={{ height: 240 }}>
-              <Doughnut data={consultationData} options={chartOptions} />
-            </div>
-          </div>
-        )}
+      {/* Profil */}
+      {activeSection === "profil" && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20, animation: "fadeIn 0.4s ease-out" }}>
+          <ChartBlock title="Distribution par âge" type="doughnut" data={stats.profil?.Q1} />
+          <ChartBlock title="Répartition par sexe" type="doughnut" data={stats.profil?.Q2} />
+          <ChartBlock title="Zone géographique" type="bar" data={stats.profil?.Q3} />
+          <ChartBlock title="Situation professionnelle" type="bar" data={stats.profil?.Q4} />
+          <ChartBlock title="Niveau d'études" type="doughnut" data={stats.profil?.Q5} />
+          <ChartBlock title="Langues parlées" type="bar" data={stats.profil?.Q6} />
+        </div>
+      )}
 
-        {insuranceData && (
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20 }}>
-            <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              Couverture santé
-            </h3>
-            <div style={{ height: 240 }}>
-              <Doughnut data={insuranceData} options={chartOptions} />
-            </div>
-          </div>
-        )}
+      {/* Accès soins */}
+      {activeSection === "acces" && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20, animation: "fadeIn 0.4s ease-out" }}>
+          <ChartBlock title="Fréquence de consultation" type="doughnut" data={stats.acces?.Q7} />
+          <ChartBlock title="Distance structure de santé" type="doughnut" data={stats.acces?.Q8} />
+          <ChartBlock title="Temps d'attente moyen" type="bar" data={stats.acces?.Q9} />
+          <ChartBlock title="Freins à la consultation" type="bar" data={stats.acces?.Q10} />
+          <ChartBlock title="Coût d'une consultation" type="doughnut" data={stats.acces?.Q11} />
+          <ChartBlock title="Couverture assurance" type="doughnut" data={stats.acces?.Q12} />
+        </div>
+      )}
 
-        {telehealthReadinessData && (
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20 }}>
-            <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              Acceptabilité téléconsultation
-            </h3>
-            <div style={{ height: 240 }}>
-              <Bar data={telehealthReadinessData} options={chartOptions} />
-            </div>
-          </div>
-        )}
+      {/* Téléconsultation */}
+      {activeSection === "telehealth" && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20, animation: "fadeIn 0.4s ease-out" }}>
+          <ChartBlock title="Acceptabilité téléconsultation" type="bar" data={stats.teleconsultation?.Q18} />
+          <ChartBlock title="Mode de consultation préféré" type="doughnut" data={stats.teleconsultation?.Q20} />
+          <ChartBlock title="Prix acceptable" type="bar" data={stats.teleconsultation?.Q21} />
+          <ChartBlock title="Intérêt dossier numérique" type="doughnut" data={stats.dossier?.Q24} />
+        </div>
+      )}
 
-        {ageData && (
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20 }}>
-            <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              Distribution par âge
-            </h3>
-            <div style={{ height: 240 }}>
-              <Doughnut data={ageData} options={chartOptions} />
-            </div>
-          </div>
-        )}
+      {/* Numérique */}
+      {activeSection === "numerique" && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20, animation: "fadeIn 0.4s ease-out" }}>
+          <ChartBlock title="Type de téléphone" type="doughnut" data={stats.numerique?.Q13} />
+          <ChartBlock title="Accès internet" type="doughnut" data={stats.numerique?.Q14} />
+          <ChartBlock title="Services de paiement mobile" type="bar" data={stats.numerique?.Q15} />
+          <ChartBlock title="Fréquence d'utilisation des apps" type="bar" data={stats.numerique?.Q16} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ChartBlock({ title, type, data }) {
+  if (!data) return null;
+  const labels = Object.keys(data).map(k => k.length > 28 ? k.substring(0, 28) + "…" : k);
+  const values = Object.values(data);
+  const isDoughnut = type === "doughnut";
+
+  const chartData = {
+    labels,
+    datasets: [{
+      label: title,
+      data: values,
+      backgroundColor: isDoughnut
+        ? palette.slice(0, labels.length).map(c => c + "cc")
+        : palette[0] + "bb",
+      borderColor: isDoughnut ? palette.slice(0, labels.length) : palette[0],
+      borderWidth: isDoughnut ? 2 : 0,
+      borderRadius: isDoughnut ? 0 : 8,
+      hoverOffset: isDoughnut ? 8 : 0,
+    }],
+  };
+
+  const ChartComp = isDoughnut ? Doughnut : Bar;
+
+  return (
+    <div style={{ ...glassCard, padding: 24 }}>
+      <h3 style={{ margin: "0 0 18px", fontSize: 14, fontWeight: 700, color: "#f0f4f8", letterSpacing: "-0.2px" }}>{title}</h3>
+      <div style={{ height: isDoughnut ? 260 : 240 }}>
+        <ChartComp data={chartData} options={makeChartOptions(isDoughnut)} />
       </div>
     </div>
   );
