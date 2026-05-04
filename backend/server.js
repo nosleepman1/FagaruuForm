@@ -27,6 +27,9 @@ app.use('/api/responses', responseRoutes);
 // Health check
 app.get('/health', (_, res) => res.json({ status: 'ok', timestamp: new Date() }));
 
-app.listen(PORT, () => console.log(`🚀 Serveur FAGARUU sur http://localhost:${PORT}`));
+// Only listen when running locally (not on Vercel)
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => console.log(`🚀 Serveur FAGARUU sur http://localhost:${PORT}`));
+}
 
-
+module.exports = app;
