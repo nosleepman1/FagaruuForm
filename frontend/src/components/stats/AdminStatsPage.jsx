@@ -38,6 +38,17 @@ export default function AdminStatsPage() {
     }
   }, [selectedResponseId, loadResponseDetail]);
 
+  // Handle Escape key to close modal
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape" && selectedResponseId) {
+        setSelectedResponseId(null);
+      }
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [selectedResponseId]);
+
   const statsCards = useMemo(() => {
     const teleconsultation = stats?.teleconsultation || {};
     const confiance = stats?.confiance || {};
@@ -65,6 +76,12 @@ export default function AdminStatsPage() {
       setCode("");
     } else {
       alert("Code d'accès incorrect.");
+    }
+  };
+
+  const handleModalBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      setSelectedResponseId(null);
     }
   };
 
@@ -108,7 +125,7 @@ export default function AdminStatsPage() {
     <div style={{ maxWidth: 1200, margin: "0 auto", padding: "28px 20px 64px" }}>
       {/* Header */}
       <header style={{ marginBottom: 32 }}>
-        <p style={{ color: "var(--primary)", fontWeight: 700, marginBottom: 8 }}>📊 Dashboard administrateur</p>
+        <p style={{ color: "var(--primary)", fontWeight: 700, marginBottom: 8 }}>Dashboard administrateur</p>
         <h1 style={{ fontSize: 32, lineHeight: 1.2, color: "var(--text)", marginBottom: 12 }}>Analyse des réponses FAGARUU</h1>
         <p style={{ color: "var(--text-muted)", lineHeight: 1.65, maxWidth: 720 }}>
           Vue d'ensemble des statistiques et des avis des répondants. Sélectionnez une réponse pour consulter les détails complets.
@@ -200,10 +217,13 @@ export default function AdminStatsPage() {
       {/* Response Detail Modal */}
       {selectedResponse && (
         <div 
-          onClick={() => setSelectedResponseId(null)}
+          onMouseDown={handleModalBackdropClick}
           style={{ 
             position: "fixed", 
-            inset: 0, 
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
             display: "flex", 
             alignItems: "flex-start", 
             justifyContent: "center", 
@@ -213,7 +233,7 @@ export default function AdminStatsPage() {
             overflowY: "auto"
           }}>
           <div 
-            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
             style={{ 
               width: "100%", 
               maxWidth: 900, 
@@ -222,12 +242,14 @@ export default function AdminStatsPage() {
               padding: 28,
               boxShadow: "0 25px 80px rgba(0,0,0,0.25)",
               marginTop: 20,
-              marginBottom: 20
+              marginBottom: 20,
+              pointerEvents: "auto"
             }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, gap: 12 }}>
               <h2 style={{ margin: 0, fontSize: 24, color: "var(--text)" }}>Détails de la réponse</h2>
               <button 
-                onClick={() => setSelectedResponseId(null)} 
+                type="button"
+                onClick={() => setSelectedResponseId(null)}
                 style={{ 
                   border: "none", 
                   background: "transparent", 
@@ -235,10 +257,18 @@ export default function AdminStatsPage() {
                   cursor: "pointer", 
                   fontSize: 28,
                   fontWeight: "bold",
-                  padding: "0 8px"
+                  padding: "0 8px",
+                  transition: "color 0.2s",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 40,
+                  height: 40
                 }}
+                onMouseEnter={(e) => e.target.style.color = "var(--text)"}
+                onMouseLeave={(e) => e.target.style.color = "var(--text-muted)"}
               >
-                ✕
+                ×
               </button>
             </div>
             {responseDetailLoading && <p style={{ color: "var(--text-muted)" }}>Chargement du détail...</p>}

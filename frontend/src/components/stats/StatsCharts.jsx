@@ -288,7 +288,7 @@ export default function StatsCharts({ stats }) {
       {timelineData && (
         <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 24 }}>
           <h3 style={{ margin: "0 0 20px 0", fontSize: 16, fontWeight: 700, color: "var(--text)" }}>
-            📈 Évolution des réponses
+            Évolution des réponses
           </h3>
           <div style={{ height: 300 }}>
             <Line data={timelineData} options={chartOptions} />
@@ -296,12 +296,12 @@ export default function StatsCharts({ stats }) {
         </div>
       )}
 
-      {/* Medical Domain - Key Stats Grid */}
+      {/* Top 3 Medical Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
         {consultationData && (
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20 }}>
             <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              🏥 Fréquence consultation (Q7)
+              Fréquence consultation
             </h3>
             <div style={{ height: 240 }}>
               <Doughnut data={consultationData} options={chartOptions} />
@@ -309,71 +309,21 @@ export default function StatsCharts({ stats }) {
           </div>
         )}
 
-        {distanceData && (
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20 }}>
-            <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              📍 Distance structure santé (Q8)
-            </h3>
-            <div style={{ height: 240 }}>
-              <Doughnut data={distanceData} options={chartOptions} />
-            </div>
-          </div>
-        )}
-
-        {waitTimeData && (
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20 }}>
-            <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              ⏱️ Temps d'attente (Q9)
-            </h3>
-            <div style={{ height: 240 }}>
-              <Doughnut data={waitTimeData} options={chartOptions} />
-            </div>
-          </div>
-        )}
-
         {insuranceData && (
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20 }}>
             <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              🛡️ Couverture santé (Q12)
+              Couverture santé
             </h3>
             <div style={{ height: 240 }}>
               <Doughnut data={insuranceData} options={chartOptions} />
             </div>
           </div>
         )}
-      </div>
 
-      {/* Barriers and Expenses */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
-        {barriersData && (
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20, gridColumn: "span 1" }}>
-            <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              🚫 Freins d'accès (Q10)
-            </h3>
-            <div style={{ height: 240 }}>
-              <Bar data={barriersData} options={chartOptions} />
-            </div>
-          </div>
-        )}
-
-        {expenseData && (
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20, gridColumn: "span 1" }}>
-            <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              💰 Budget consultation (Q11)
-            </h3>
-            <div style={{ height: 240 }}>
-              <Bar data={expenseData} options={chartOptions} />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Telehealth Section */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
         {telehealthReadinessData && (
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20 }}>
             <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              📱 Acceptabilité téléconsultation (Q18)
+              Acceptabilité téléconsultation
             </h3>
             <div style={{ height: 240 }}>
               <Bar data={telehealthReadinessData} options={chartOptions} />
@@ -381,60 +331,13 @@ export default function StatsCharts({ stats }) {
           </div>
         )}
 
-        {modePrefData && (
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20 }}>
-            <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              🎯 Mode préféré (Q20)
-            </h3>
-            <div style={{ height: 240 }}>
-              <Doughnut data={modePrefData} options={chartOptions} />
-            </div>
-          </div>
-        )}
-
-        {priceData && (
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20 }}>
-            <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              💵 Prix acceptable (Q21)
-            </h3>
-            <div style={{ height: 240 }}>
-              <Bar data={priceData} options={chartOptions} />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Digital Health */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
-        {medicalRecordData && (
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20 }}>
-            <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              📋 Dossier médical numérique (Q24)
-            </h3>
-            <div style={{ height: 240 }}>
-              <Doughnut data={medicalRecordData} options={chartOptions} />
-            </div>
-          </div>
-        )}
-
         {ageData && (
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20 }}>
             <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              👥 Distribution par âge (Q1)
+              Distribution par âge
             </h3>
             <div style={{ height: 240 }}>
               <Doughnut data={ageData} options={chartOptions} />
-            </div>
-          </div>
-        )}
-
-        {phoneData && (
-          <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 20, padding: 20 }}>
-            <h3 style={{ margin: "0 0 16px 0", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
-              📲 Type de téléphone (Q13)
-            </h3>
-            <div style={{ height: 240 }}>
-              <Bar data={phoneData} options={chartOptions} />
             </div>
           </div>
         )}
