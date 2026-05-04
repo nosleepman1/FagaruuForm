@@ -50,10 +50,10 @@ export default function AdminStatsPage() {
     const pctQ44 = totalQ44 > 0 ? Math.round((yesQ44 / totalQ44) * 100) : 0;
 
     return [
-      { label: "Réponses totales", value: stats?.total ?? 0, icon: "📊", gradient: "linear-gradient(135deg, #00e6a8, #00b4d8)", glow: "rgba(0,230,168,0.2)" },
-      { label: "Confiance diagnostic", value: teleconsultation?.Q22?.avg ? `${teleconsultation.Q22.avg.toFixed(1)}/5` : "—", icon: "🩺", gradient: "linear-gradient(135deg, #06b6d4, #8b5cf6)", glow: "rgba(6,182,212,0.2)" },
-      { label: "Confiance données", value: confiance?.Q39?.avg ? `${confiance.Q39.avg.toFixed(1)}/5` : "—", icon: "🔒", gradient: "linear-gradient(135deg, #8b5cf6, #ec4899)", glow: "rgba(139,92,246,0.2)" },
-      { label: "Intérêt pilote", value: `${pctQ44}%`, icon: "🚀", gradient: "linear-gradient(135deg, #ff7a45, #f59e0b)", glow: "rgba(255,122,69,0.2)" },
+      { label: "Réponses totales", value: stats?.total ?? 0, gradient: "linear-gradient(135deg, #00e6a8, #00b4d8)", glow: "rgba(0,230,168,0.2)" },
+      { label: "Confiance diagnostic", value: teleconsultation?.Q22?.avg ? `${teleconsultation.Q22.avg.toFixed(1)}/5` : "—", gradient: "linear-gradient(135deg, #06b6d4, #8b5cf6)", glow: "rgba(6,182,212,0.2)" },
+      { label: "Confiance données", value: confiance?.Q39?.avg ? `${confiance.Q39.avg.toFixed(1)}/5` : "—", gradient: "linear-gradient(135deg, #8b5cf6, #ec4899)", glow: "rgba(139,92,246,0.2)" },
+      { label: "Intérêt pilote", value: `${pctQ44}%`, gradient: "linear-gradient(135deg, #ff7a45, #f59e0b)", glow: "rgba(255,122,69,0.2)" },
     ];
   }, [stats]);
 
@@ -75,7 +75,9 @@ export default function AdminStatsPage() {
           animation: "fadeIn 0.6s ease-out",
           boxShadow: "0 0 80px rgba(0,230,168,0.06), 0 8px 40px rgba(0,0,0,0.3)"
         }}>
-          <div style={{ width: 56, height: 56, borderRadius: 16, background: "linear-gradient(135deg, #00e6a8, #00b4d8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, marginBottom: 24 }}>🔐</div>
+          <div style={{ width: 56, height: 56, borderRadius: 16, background: "linear-gradient(135deg, #00e6a8, #00b4d8)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
           <h1 style={{ fontSize: 26, fontWeight: 800, color: "var(--text)", marginBottom: 8, letterSpacing: "-0.5px" }}>Espace administrateur</h1>
           <p style={{ color: "var(--text-muted)", marginBottom: 28, lineHeight: 1.7, fontSize: 14 }}>
             Entrez le code d'accès pour consulter les statistiques et réponses FAGARUU.
@@ -124,8 +126,8 @@ export default function AdminStatsPage() {
   if (statsError) return <ErrorState msg="Impossible de charger les statistiques." />;
 
   const tabs = [
-    { id: "overview", label: "Vue d'ensemble", icon: "📊" },
-    { id: "responses", label: "Réponses", icon: "📋" },
+    { id: "overview", label: "Vue d'ensemble" },
+    { id: "responses", label: "Réponses" },
   ];
 
   // ─── Main Dashboard ─────────────────────────────────────────────────────────
@@ -183,7 +185,7 @@ export default function AdminStatsPage() {
               pointerEvents: "none"
             }} />
             <div style={{ position: "relative", zIndex: 1 }}>
-              <div style={{ fontSize: 28, marginBottom: 12 }}>{kpi.icon}</div>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: kpi.gradient, marginBottom: 14, boxShadow: `0 0 12px ${kpi.glow}` }} />
               <div style={{
                 fontSize: 36, fontWeight: 800,
                 background: kpi.gradient,
@@ -210,12 +212,12 @@ export default function AdminStatsPage() {
               background: activeTab === tab.id ? "rgba(0,230,168,0.12)" : "transparent",
               color: activeTab === tab.id ? "#00e6a8" : "var(--text-muted)",
               fontWeight: 600, cursor: "pointer", fontSize: 14,
-              fontFamily: "'Inter', sans-serif",
+              fontFamily: "'Inter', sans-serif", letterSpacing: "-0.2px",
               transition: "all 0.2s",
               display: "flex", alignItems: "center", gap: 8
             }}
           >
-            <span>{tab.icon}</span> {tab.label}
+            {tab.label}
           </button>
         ))}
       </div>
@@ -397,7 +399,7 @@ function QuickBadge({ text, color }) {
 function ErrorState({ msg }) {
   return (
     <div style={{ textAlign: "center", padding: 32 }}>
-      <div style={{ fontSize: 28, marginBottom: 8 }}>⚠️</div>
+      <div style={{ fontSize: 14, fontWeight: 700, color: "#ff5c6c", marginBottom: 8 }}>Erreur</div>
       <p style={{ color: "#ff5c6c", fontSize: 14, fontWeight: 500 }}>{msg}</p>
     </div>
   );
@@ -406,7 +408,7 @@ function ErrorState({ msg }) {
 function EmptyState({ msg }) {
   return (
     <div style={{ textAlign: "center", padding: 40 }}>
-      <div style={{ fontSize: 32, marginBottom: 8, opacity: 0.5 }}>📭</div>
+      <div style={{ width: 40, height: 2, background: "rgba(255,255,255,0.1)", borderRadius: 2, margin: "0 auto 12px" }} />
       <p style={{ color: "var(--text-muted)", fontSize: 14 }}>{msg}</p>
     </div>
   );

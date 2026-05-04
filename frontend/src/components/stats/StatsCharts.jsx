@@ -74,11 +74,11 @@ function makeChartOptions(hideScales = false) {
 
 // Section tabs for the chart dashboard
 const CHART_SECTIONS = [
-  { id: "timeline", label: "📈 Évolution" },
-  { id: "profil", label: "👤 Profil" },
-  { id: "acces", label: "🏥 Accès soins" },
-  { id: "telehealth", label: "📱 Téléconsultation" },
-  { id: "numerique", label: "💻 Numérique" },
+  { id: "timeline", label: "Évolution" },
+  { id: "profil", label: "Profil" },
+  { id: "acces", label: "Accès soins" },
+  { id: "telehealth", label: "Téléconsultation" },
+  { id: "numerique", label: "Numérique" },
 ];
 
 export default function StatsCharts({ stats }) {
