@@ -45,13 +45,16 @@ export default function AdminStatsPage() {
     const teleconsultation = stats?.teleconsultation || {};
     const confiance = stats?.confiance || {};
     const engagement = stats?.engagement || {};
-    const totalQ44 = Object.values(engagement?.Q44 || {}).reduce((a, b) => a + b, 0) || 0;
-    const yesQ44 = engagement?.Q44?.["Oui"] || 0;
+
+    const q44Array = engagement?.Q44 || [];
+    const totalQ44 = Array.isArray(q44Array) ? q44Array.reduce((acc, curr) => acc + (curr.count || 0), 0) : 0;
+    const yesItem = Array.isArray(q44Array) ? q44Array.find(item => item._id === "Oui") : null;
+    const yesQ44 = yesItem ? yesItem.count : 0;
     const pctQ44 = totalQ44 > 0 ? Math.round((yesQ44 / totalQ44) * 100) : 0;
 
     return [
       { label: "Réponses totales", value: stats?.total ?? 0, gradient: "linear-gradient(135deg, #00e6a8, #00b4d8)", glow: "rgba(0,230,168,0.2)" },
-      { label: "Connaissance SR", value: teleconsultation?.Q22?.avg ? `${teleconsultation.Q22.avg.toFixed(1)}/5` : "—", gradient: "linear-gradient(135deg, #06b6d4, #8b5cf6)", glow: "rgba(6,182,212,0.2)" },
+      { label: "Confiance diagnostic", value: teleconsultation?.Q22?.avg ? `${teleconsultation.Q22.avg.toFixed(1)}/5` : "—", gradient: "linear-gradient(135deg, #06b6d4, #8b5cf6)", glow: "rgba(6,182,212,0.2)" },
       { label: "Confiance plateforme", value: confiance?.Q39?.avg ? `${confiance.Q39.avg.toFixed(1)}/5` : "—", gradient: "linear-gradient(135deg, #8b5cf6, #ec4899)", glow: "rgba(139,92,246,0.2)" },
       { label: "Prêts à tester", value: `${pctQ44}%`, gradient: "linear-gradient(135deg, #ff7a45, #f59e0b)", glow: "rgba(255,122,69,0.2)" },
     ];

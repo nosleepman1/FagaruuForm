@@ -236,7 +236,7 @@ function CustomScoreCard({ title, data, color = "#8b5cf6" }) {
 const SUB_TABS = [
   { id: "overview", label: "Vue d'ensemble" },
   { id: "profil", label: "Profil" },
-  { id: "connaissances_sr", label: "Connaissances SR" },
+  { id: "teleconsultation", label: "Téléconsultation" },
   { id: "sources_info", label: "Sources d'info" },
   { id: "freins", label: "Freins" },
   { id: "attentes", label: "Attentes FAGARUU" },
@@ -314,8 +314,8 @@ export default function StatsCharts({ stats }) {
           </>
         )}
 
-        {/* 3. CONNAISSANCES SR */}
-        {activeSection === "connaissances_sr" && (
+        {/* 3. TÉLÉCONSULTATION */}
+        {activeSection === "teleconsultation" && (
           <>
             <CustomScoreCard title="Confiance diagnostic à distance" data={stats.teleconsultation?.Q22} color={colors.purple} />
             <CustomProgressBarsCard title="Prêt à téléconsulter" data={stats.teleconsultation?.Q18} total={total} color={colors.blue} />
