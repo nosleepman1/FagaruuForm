@@ -51,9 +51,9 @@ export default function AdminStatsPage() {
 
     return [
       { label: "Réponses totales", value: stats?.total ?? 0, gradient: "linear-gradient(135deg, #00e6a8, #00b4d8)", glow: "rgba(0,230,168,0.2)" },
-      { label: "Confiance diagnostic", value: teleconsultation?.Q22?.avg ? `${teleconsultation.Q22.avg.toFixed(1)}/5` : "—", gradient: "linear-gradient(135deg, #06b6d4, #8b5cf6)", glow: "rgba(6,182,212,0.2)" },
-      { label: "Confiance données", value: confiance?.Q39?.avg ? `${confiance.Q39.avg.toFixed(1)}/5` : "—", gradient: "linear-gradient(135deg, #8b5cf6, #ec4899)", glow: "rgba(139,92,246,0.2)" },
-      { label: "Intérêt pilote", value: `${pctQ44}%`, gradient: "linear-gradient(135deg, #ff7a45, #f59e0b)", glow: "rgba(255,122,69,0.2)" },
+      { label: "Connaissance SR", value: teleconsultation?.Q22?.avg ? `${teleconsultation.Q22.avg.toFixed(1)}/5` : "—", gradient: "linear-gradient(135deg, #06b6d4, #8b5cf6)", glow: "rgba(6,182,212,0.2)" },
+      { label: "Confiance plateforme", value: confiance?.Q39?.avg ? `${confiance.Q39.avg.toFixed(1)}/5` : "—", gradient: "linear-gradient(135deg, #8b5cf6, #ec4899)", glow: "rgba(139,92,246,0.2)" },
+      { label: "Prêts à tester", value: `${pctQ44}%`, gradient: "linear-gradient(135deg, #ff7a45, #f59e0b)", glow: "rgba(255,122,69,0.2)" },
     ];
   }, [stats]);
 
@@ -76,7 +76,7 @@ export default function AdminStatsPage() {
           boxShadow: "0 0 80px rgba(0,230,168,0.06), 0 8px 40px rgba(0,0,0,0.3)"
         }}>
           <div style={{ width: 56, height: 56, borderRadius: 16, background: "linear-gradient(135deg, #00e6a8, #00b4d8)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0110 0v4" /></svg>
           </div>
           <h1 style={{ fontSize: 26, fontWeight: 800, color: "var(--text)", marginBottom: 8, letterSpacing: "-0.5px" }}>Espace administrateur</h1>
           <p style={{ color: "var(--text-muted)", marginBottom: 28, lineHeight: 1.7, fontSize: 14 }}>
@@ -104,8 +104,8 @@ export default function AdminStatsPage() {
             transition: "transform 0.15s, box-shadow 0.2s",
             boxShadow: "0 4px 20px rgba(0,230,168,0.3)"
           }}
-          onMouseEnter={(e) => { e.target.style.transform = "translateY(-1px)"; e.target.style.boxShadow = "0 6px 28px rgba(0,230,168,0.4)"; }}
-          onMouseLeave={(e) => { e.target.style.transform = "translateY(0)"; e.target.style.boxShadow = "0 4px 20px rgba(0,230,168,0.3)"; }}
+            onMouseEnter={(e) => { e.target.style.transform = "translateY(-1px)"; e.target.style.boxShadow = "0 6px 28px rgba(0,230,168,0.4)"; }}
+            onMouseLeave={(e) => { e.target.style.transform = "translateY(0)"; e.target.style.boxShadow = "0 4px 20px rgba(0,230,168,0.3)"; }}
           >Accéder au dashboard</button>
         </div>
       </div>
@@ -126,8 +126,8 @@ export default function AdminStatsPage() {
   if (statsError) return <ErrorState msg="Impossible de charger les statistiques." />;
 
   const tabs = [
-    { id: "overview", label: "Vue d'ensemble" },
-    { id: "responses", label: "Réponses" },
+    { id: "overview", label: "Statistiques" },
+    { id: "responses", label: "Réponses individuelles" },
   ];
 
   // ─── Main Dashboard ─────────────────────────────────────────────────────────
@@ -174,8 +174,8 @@ export default function AdminStatsPage() {
             animation: `slideUp 0.5s ease-out ${i * 0.1}s both`,
             cursor: "default",
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = `0 12px 40px ${kpi.glow}`; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = `0 12px 40px ${kpi.glow}`; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)"; }}
           >
             {/* Glow circle */}
             <div style={{
@@ -245,8 +245,8 @@ export default function AdminStatsPage() {
                 background: "transparent", color: "var(--text-muted)", cursor: "pointer",
                 fontSize: 13, fontFamily: "'Inter', sans-serif", transition: "all 0.2s"
               }}
-              onMouseEnter={(e) => { e.target.style.borderColor = "rgba(0,230,168,0.3)"; e.target.style.color = "#00e6a8"; }}
-              onMouseLeave={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.1)"; e.target.style.color = "var(--text-muted)"; }}
+                onMouseEnter={(e) => { e.target.style.borderColor = "rgba(0,230,168,0.3)"; e.target.style.color = "#00e6a8"; }}
+                onMouseLeave={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.1)"; e.target.style.color = "var(--text-muted)"; }}
               >↻ Rafraîchir</button>
             </div>
 
